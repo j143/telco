@@ -1,17 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import './App.css';
+import Problems from './Problems';
+import ProblemDetails from './ProblemDetails';
 
-function App() {
-  const [problems, setProblems] = useState([]);
-  const [newProblem, setNewProblem] = useState({ title: '', description: '', difficulty: '' });
-  const [solution, setSolution] = useState({ problemId: '', solutionCode: '' });
-  const [evaluationResult, setEvaluationResult] = useState(null);
+function Home() {
+  return (
+    <div>
+      <h1>5G and Network Engineer Platform</h1>
+      <nav>
+        <ul>
+          <li><Link to="/problems">Problems</Link></li>
+          <li><Link to="/add-problem">Add Problem</Link></li>
+          <li><Link to="/submit-solution">Submit Solution</Link></li>
+        </ul>
+      </nav>
+    </div>
+  );
+}
 
-  useEffect(() => {
-    fetch('/problems')
-      .then(response => response.json())
-      .then(data => setProblems(data));
-  }, []);
+function AddProblem() {
+  const [newProblem, setNewProblem] = React.useState({ title: '', description: '', difficulty: '' });
 
   const handleAddProblem = () => {
     fetch('/problems', {
@@ -20,30 +29,11 @@ function App() {
       body: JSON.stringify(newProblem),
     })
       .then(response => response.json())
-      .then(data => setProblems([...problems, data]));
-  };
-
-  const handleSubmitSolution = () => {
-    fetch('/solutions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(solution),
-    })
-      .then(response => response.json())
-      .then(data => setEvaluationResult(data));
+      .then(data => console.log(data));
   };
 
   return (
-    <div className="App">
-      <h1>5G and Network Engineer Platform</h1>
-
-      <h2>Problems</h2>
-      <ul>
-        {problems.map(problem => (
-          <li key={problem.id}>{problem.title} - {problem.difficulty}</li>
-        ))}
-      </ul>
-
+    <div>
       <h2>Add Problem</h2>
       <input
         type="text"
@@ -64,7 +54,26 @@ function App() {
         onChange={e => setNewProblem({ ...newProblem, difficulty: e.target.value })}
       />
       <button onClick={handleAddProblem}>Add Problem</button>
+    </div>
+  );
+}
 
+function SubmitSolution() {
+  const [solution, setSolution] = React.useState({ problemId: '', solutionCode: '' });
+  const [evaluationResult, setEvaluationResult] = React.useState(null);
+
+  const handleSubmitSolution = () => {
+    fetch('/solutions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(solution),
+    })
+      .then(response => response.json())
+      .then(data => setEvaluationResult(data));
+  };
+
+  return (
+    <div>
       <h2>Submit Solution</h2>
       <input
         type="number"
@@ -86,6 +95,20 @@ function App() {
         </div>
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/problems" element={<Problems />} />
+        <Route path="/problems/:id" element={<ProblemDetails />} />
+        <Route path="/add-problem" element={<AddProblem />} />
+        <Route path="/submit-solution" element={<SubmitSolution />} />
+      </Routes>
+    </Router>
   );
 }
 
