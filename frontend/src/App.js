@@ -105,6 +105,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/problems" element={<Problems />} />
         <Route path="/problems/:id" element={<ProblemDetails />} />
+        <Route path="/problems/:id/submit" element={<SubmitSolution />} />
         <Route path="/add-problem" element={<AddProblem />} />
         <Route path="/submit-solution" element={<SubmitSolution />} />
       </Routes>
